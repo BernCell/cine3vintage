@@ -1,6 +1,7 @@
 {
-  "short_name": "Kino App",
-  "name": "Create React App Sample",
+  "short_name": "Cine3Vintage",
+    "name": "Mon Cine-3 Vintage",
+    "description": "Une application qui répertorie surtout les films anciens",
   "icons": [
     {
       "src": "favicon.ico",

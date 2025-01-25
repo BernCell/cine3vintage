@@ -1,0 +1,47 @@
+@font-face {
+    font-family: "font-1";
+    src: url(../assets/fonts/Poppins-Regular.ttf);
+  }
+  @font-face {
+    font-family: "font-2";
+    src: url(../assets/fonts/Poppins-Light.ttf);
+  }
+  
+  $font-1: "font-1", sans-serif;
+  $font-2: "font-2", sans-serif;
+  
+  $color-1: #EEBC7A;
+  $color-2: #6C5E4D;
+  $color-3: #7A7A7A;
+  $black : #231F20;
+  $black-2: #121112;
+  $black-3: #121112c3;
+  $white: #FFF8DC;
+  
+  
+  @mixin center {
+    justify-content: center;
+      align-items: center;
+      display: flex;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: $font-1;
+  }
+  
+  body {
+    background: $color-2;
+    color: $white;
+  }
+  li {
+    list-style: none;
+  }
+  .result {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  

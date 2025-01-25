@@ -17,7 +17,7 @@ const Card = React.memo(({ movie }) => {
     const fetchTrailer = async () => {
         try {
             const trailerResponse = await axios.get(
-                `http://localhost:5000/api/movies/${movie.id}/videos?language=fr-FR`
+                `http://localhost:5001/api/movies/${movie.id}/videos?language=fr-FR`
             );
             const trailers = trailerResponse.data.results;
 
@@ -48,7 +48,6 @@ const Card = React.memo(({ movie }) => {
             setIsPopupOpen(false);
         }
     };
-
 
 
     const dateFormat = (date) => {
@@ -149,10 +148,6 @@ const Card = React.memo(({ movie }) => {
 
     const addStorage = () => {
 
-        //  setFavClicked = "Copié dans Favoris"
-        // <span
-
-        // >⚠️</span>` ;
 
         let storedData = window.localStorage.movies
             ? window.localStorage.movies.split(",")
