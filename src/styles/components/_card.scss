@@ -1,0 +1,177 @@
+.card {
+
+    .favorites{
+      @include center;
+     
+      margin: auto;
+      cursor: pointer;
+    }
+  
+    #btn {
+      background: $color-1;
+      border-radius: 20px;
+      border: 1px solid black;
+      padding: 2px 4px;
+      margin-bottom: 15px;
+      color: $black;
+  
+  
+      width: 150px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 50;
+  
+      &:hover {
+        background: $white;
+        box-shadow: 0 0 10px $color-3;
+        font-size: 1.025rem;
+      }
+    }
+  
+    flex: 1 0 25%;
+    min-width: 260px;
+    max-width: 280px;
+    height: 650px;
+    background: $black-3;
+    border-radius: 35px;
+    border: 1px solid $black;
+    margin: 5px;
+    padding: 26px 15px 30px;
+    position: relative;
+    overflow: hidden;
+  
+    &::after {
+      content: "";
+      position: absolute;
+      height: 90px;
+      width: 100%;
+      background: linear-gradient(180deg, rgba(195, 34, 34, 0) 0%, $black 55%);
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      border-radius: 0 0 30px 30px;
+    }
+  
+    img {
+      width: 80%;
+      height: 254px;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      margin: 0 auto;
+      border-radius: 50px;
+      box-shadow: 0 8px 1px rgba(255, 255, 255, 0.1),
+        0 16px 1px rgba(255, 255, 255, 0.05);
+    }
+  
+    .movie-card {
+      
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+  
+    iframe {
+      border: none; /* Supprimer la bordure */
+      max-width: 90%; /*  la vidéo ne dépasse pas l'écran */
+      max-height: 80%; /* la vidéo ne dépasse pas l'écran */
+    }
+    
+    .movie-image {
+      width: 100%;
+      height: auto;
+    }
+    
+    .movie-trailer-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7); /* Fond semi-transparent pour l'overlay */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .movie-trailer-overlay iframe {
+      max-width: 100%;
+      max-height: 100%;
+      border: none;
+    }
+    
+    
+    h2 {
+      margin: 24px 0 0px;
+      letter-spacing: 1px;
+      line-height: 20px;
+      @include center ;
+    }
+  
+  
+    .release{
+      margin: 5px;
+      font-size: 1,5rem;
+    }
+    h5 {
+      color: $color-3;
+      letter-spacing: 1px;
+      font-size: 1.2rem;
+      font-weight: 300;
+      @include center ;
+    }
+    h4 {
+      letter-spacing: 1px;
+      font-size: 1.2rem;
+      margin-top: -4px;
+      @include center ;
+  
+      span {
+        font-size: 0.7rem;
+      }
+    }
+    ul {
+      
+      margin: auto;
+      font-family: $font-1;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      
+    }
+    li {
+     
+      background: $color-1;
+      border-radius: 20px;
+      border: 1px solid black;
+      padding: 2px 4px;
+      margin: 2px;
+      color: $black;
+  
+      &:first-child {
+        margin-left: -4px;
+      }
+    }
+    h3 {
+      letter-spacing: 1px;
+      font-size: 1.4rem;
+      margin-top: 10px;
+    }
+    p {
+      color: $color-3;
+      font-size: 1rem;
+      line-height: 20px;
+      height: 130px;
+      overflow-y: scroll;
+  
+  
+      &::-webkit-scrollbar {
+        display:contents;
+      }
+    }
+    
+  }
+  

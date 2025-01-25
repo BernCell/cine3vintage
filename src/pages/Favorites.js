@@ -4,6 +4,7 @@ import axios from 'axios';
 import Card from '../components/Card';
 
 
+
 const Favorites = () => {
     const [listMoviesData, setListMoviesData] = useState([]);
 
@@ -21,7 +22,7 @@ const Favorites = () => {
 
         // Utilise Promise.all pour gérer plusieurs requêtes API en parallèle
         const fetchMovies = uniqueMoviesId.map(id =>
-            axios.get(`http://localhost:5000/api/movies/popular/${id}?language=fr-FR
+            axios.get(`http://localhost:5001/api/movies/popular/${id}?language=fr-FR
 `)
         );
 

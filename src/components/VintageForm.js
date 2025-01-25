@@ -5,6 +5,7 @@ import Card from './Card';
 
 
 
+
 const VintageForm = () => {
     const [sortNote, setSortNote] = useState(null); // Tri par note
     const [sortDate, setSortDate] = useState(null); // Tri par date
@@ -20,6 +21,7 @@ const VintageForm = () => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(vintageQuery);
 
 
+
     // Gestion des effets pour la recherche avec le debouncing
     useEffect(() => {
         // Débouncier la recherche
@@ -33,58 +35,80 @@ const VintageForm = () => {
     }, [vintageQuery]);
 
 
+
+
+
+
     useEffect(() => {
 
-        if (debouncedSearchQuery === '') return;
+        // if (debouncedSearchQuery === '') return;
+        if (debouncedSearchQuery !== '') {  // Si la recherche est activée
 
+            axios.get(`http://localhost:5001/api/search/movie?query=${debouncedSearchQuery}&language=fr-FR`).then((res) => {
+                // Filtrage local pour appliquer la plage de dates entre 1940 et 1980
+                const filteredMovies = res.data.results.filter(movie => {
+                    const releaseDate = movie.release_date;
+                    return releaseDate && releaseDate >= '1940-01-01' && releaseDate <= '1980-12-31';
+                });
+                setMovies(filteredMovies);
 
-        axios.get(`http://localhost:5000/api/search/movie?query=${debouncedSearchQuery}&language=fr-FR`).then((res) => {
-            // Filtrage local pour appliquer la plage de dates entre 1940 et 1980
-            const filteredMovies = res.data.results.filter(movie => {
-                const releaseDate = movie.release_date;
-                return releaseDate && releaseDate >= '1940-01-01' && releaseDate <= '1980-12-31';
-            });
-            setMovies(filteredMovies);
-
-        }).catch(error => console.error('Error fetching movies by title:', error));
+            }).catch(error => console.error('Error fetching movies by title:', error));
+        }
 
     }, [debouncedSearchQuery])
 
 
     useEffect(() => {
-        let startDate = '1940-01-01';
-        let endDate = '1949-12-31';
-        switch (decade) {
-            case '1950s':
-                startDate = '1950-01-01';
-                endDate = '1959-12-31';
-                break;
-            case '1960s':
-                startDate = '1960-01-01';
-                endDate = '1969-12-31';
-                break;
-            case '1970s':
-                startDate = '1970-01-01';
-                endDate = '1979-12-31';
-                break;
-            case '1980s':
-                startDate = '1980-01-01';
-                endDate = '1989-12-31';
-                break;
-            default:
+        setMovies([]);
+        console.log("Décennie sélectionnée : ", decade);
+        console.log("Langue sélectionnée : ", language);
+        if (debouncedSearchQuery === '') {
+            let startDate = '1940-01-01';
+            let endDate = '1949-12-31';
+            switch (decade) {
+                case '1950s':
+                    startDate = '1950-01-01';
+                    endDate = '1959-12-31';
+                    break;
+                case '1960s':
+                    startDate = '1960-01-01';
+                    endDate = '1969-12-31';
+                    break;
+                case '1970s':
+                    startDate = '1970-01-01';
+                    endDate = '1979-12-31';
+                    break;
+                case '1980s':
+                    startDate = '1980-01-01';
+                    endDate = '1989-12-31';
+                    break;
+                default:
 
-                break;
+                    break;
+            }
+
+
+
+            //             axios.get('http://localhost:5001/api/discover/movie?primary_release_date.gte=1940-01-01&primary_release_date.lte=1949-12-31&language=fr')
+            //   .then(response => console.log('Réponse reçue :', response.data))
+            //   .catch(error => console.error('Erreur axios :', error));
+
+            // primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}&with_original_language=${language}&language=fr-FR
+            axios.get(`http://localhost:5001/api/discover/movie?primary_release_date.gte=1940-01-01&primary_release_date.lte=1949-12-31&language=fr`)
+                .then(response => {
+                    console.log("les films récupérés", response.data.results); // Affiche les films récupérés
+                    console.log("Réponse complète :", response.data);
+
+
+                    setMovies(response.data.results);
+                })
+                .catch(error => console.error('Error fetching movies:', error));
         }
+    }, [decade, language, debouncedSearchQuery]);
 
 
-        axios.get(`http://localhost:5000/api/discover/movie?primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}&with_original_language=${language}&language=fr-FR`)
-            .then(response => {
-                console.log(response.data.results); // Affiche les films récupérés
 
-                setMovies(response.data.results);
-            })
-            .catch(error => console.error('Error fetching movies:', error));
-    }, [decade, language]);
+
 
 
 
@@ -93,7 +117,7 @@ const VintageForm = () => {
 
         if (e.target.value === "") {
             // setVintageQuery("a")
-            setDecade('1940')
+            setDecade('1940s')
             setLanguage('fr')
         }
     };
