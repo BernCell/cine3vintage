@@ -1,18 +1,48 @@
-import axios from 'axios';
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
-
-
-
-
-const Card = React.memo(({ movie }) => {
-
-
+const Card = ({ movie }) => {
+    const imageRef = useRef(null);  // Référence à l'image
     const [trailerKey, setTrailerKey] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const imageRef = useRef(null);  // Référence à l'image
+
+    const [modalMovie, setModalMovie] = useState(null); // Film actuellement affiché dans le modal
+    const [details, setDetails] = useState(null); // Détails du film (cast, crew)
+    const [recommendations, setRecommendations] = useState([]); // Recommandations
+    const [loadingDetails, setLoadingDetails] = useState(false); // Spinner pour le chargement des détails
 
 
+    const handleMovieClick = (recMovie) => {
+        setLoadingDetails(true); // Afficher le spinner
+        axios
+            .get(`http://localhost:5001/api/movies/${recMovie.id}/credits?language=fr-FR`)
+            .then((res) => {
+                console.log("credits", res.data);
+
+                setDetails(res.data); // Charger les détails
+                setModalMovie(recMovie); // Mettre à jour toutes les infos principales avec le film recommandé
+
+                return axios.get(`http://localhost:5001/api/movies/${recMovie.id}/recommendations?language=fr-FR`);
+            })
+            .then((res) => {
+                // Filtrage local des recommandations pour la période 1940-1980
+                const filteredRecommendations = res.data.results.filter((movie) => {
+                    const releaseDate = movie.release_date;
+                    return releaseDate >= '1940-01-01' && releaseDate <= '1980-12-31';
+                });
+                setRecommendations(filteredRecommendations || []); // Charger les recommandations filtrées
+            })
+            .catch((error) => console.error("Erreur lors du chargement des détails :", error))
+            .finally(() => setLoadingDetails(false)); // Masquer le spinner
+    };
+
+
+    const closeModal = () => {
+        setModalMovie(null); // Fermer le modal
+        setDetails(null); // Réinitialiser les détails
+        setRecommendations([]); // Réinitialiser les recommandations
+    };
 
     const fetchTrailer = async () => {
         try {
@@ -181,103 +211,167 @@ const Card = React.memo(({ movie }) => {
 
     };
 
-
     return (
-        <div className='card'>
-            {
-                movie.genre_ids ? (
-                    <div className='favorites' id='btn' onClick={() => {
+        <>
+            <div className="card">
+                {/* Carte principale */}
+                {/* <h2 onClick={() => handleMovieClick(movie)} className="movie-title">{movie.title}</h2>
+            <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} alt={movie.title} />
+            <p><strong>Date :</strong> {movie.release_date}</p>
+            <p><strong>Langue :</strong> {movie.original_language}</p> */}
 
-                        addStorage()
-                    }
+                {
 
-                    }
 
+                    movie.genre_ids ? (
+                        <div className='favorites' id='btn' onClick={() => {
+
+                            addStorage()
+                        }
+
+                        }
+
+                        > Ajout aux Favoris
+                            <span
+                            >
+                                💛</span>
+
+                        </div>
+                    ) : (
+                        <div className='favorites'
+                            id='btn'
+                            onClick={() => {
+                                deleteStorage(movie.id)
+
+                            }}>Retirer<br />des Favoris
+                            <span id={movie.id}
+
+                            >⚠️</span>
+                        </div>
+
+                    )}
+                <div className="movie-card" onClick={handlePopupToggle}>
+
+
+                    <img
+                        ref={imageRef}  // Associer la ref à l'image
+                        src={movie.poster_path ?
+                            "https://image.tmdb.org/t/p/original" + movie.poster_path :
+                            "./img/poster.jpg"
+                        }
+                        alt={` affiche ${movie.title}`}
+                    />
+
+                    {isPopupOpen && trailerKey && (
+                        < div className="movie-trailer-overlay">
+
+                            <iframe
+                                width="560"
+                                height="315"
+                                src={`https://www.youtube.com/embed/${trailerKey}`}
+
+                                title="YouTube video player"
+
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                onError={() => setTrailerKey(null)}
+                            // En cas d'erreur de chargement, réinitialiser la clé
+                            ></iframe>
+
+                        </div>
+
+                    )} <div> {isPopupOpen && !trailerKey && <p>Hélas, il n'y a pas de bande-annonce disponible pour ce film.</p>}
+
+
+                    </div></div>
+
+                {/* <h5 id="title" onClick={openModal} className="movie-title">
+                    {movie.title}
+                </h5> */}
+
+                <h5 onClick={() => handleMovieClick(movie)} className="movie-title">{movie.title}</h5>
+
+                <h4 className='release'>{movie.release_date ?
+                    <span>Sorti le: {dateFormat(movie.release_date)} </span> : null
+                }</h4>
+                <h4>{movie.vote_average.toFixed(1) + "/10"}<span>⭐</span></h4>
+
+                <ul className='genres'>
+                    {movie.genre_ids ? filmGenres() : movie.genres.map((genre) => <li key={genre}>
+                        {genre.name}
+                    </li>)}
+                </ul>
+
+                {movie.overview ?
+                    <h2 className='overview'></h2> : ""}
+                <p>{movie.overview}</p>
+
+            </div>
+
+
+            {/* Modal */}
+            <AnimatePresence>
+                {modalMovie && (
+                    <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={closeModal} // Fermer en cliquant à l'extérieur
                     >
-
-
-
-
-                        Ajout aux Favoris
-                        <span
+                        <motion.div
+                            className="modal-content"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()} // Empêche la fermeture
                         >
-                            💛</span>
-
-                    </div>
-                ) : (
-                    <div className='favorites'
-                        id='btn'
-                        onClick={() => {
-                            // e.preventDefault()
-                            deleteStorage(movie.id)
-                            // deleteStorage()
-
-                            // window.location.reload();
-                        }}>Retirer<br />des Favoris
-                        <span id={movie.id}
-
-                        >⚠️</span>
-                    </div>
-
+                            <button className="close-button" onClick={closeModal}>X</button>
+                            {loadingDetails ? (
+                                <p>Chargement...</p> // Spinner si les détails sont en cours de chargement
+                            ) : (
+                                <>
+                                    <h2>{modalMovie.title}</h2>
+                                    <p><strong>Résumé :</strong> {modalMovie.overview}</p>
+                                    <p><strong>Date de sortie :</strong> {dateFormat(modalMovie.release_date)}</p>
+                                    <p><strong>Langue originale :</strong> {modalMovie.original_language}</p>
+                                    <p><strong>Réalisateur :</strong> {details.crew?.find(c => c.job === "Director")?.name || "N/A"}</p>
+                                    <h3>Distribution :</h3>
+                                    <ul>
+                                        {details?.cast?.slice(0, 10).map((actor) => (
+                                            <li key={actor.id}>{actor.name} : {actor.character}</li>
+                                        ))}
+                                    </ul>
+                                    <h4>Crew:</h4>
+                                    <ul>
+                                        {details.crew && details.crew.map((crewMember) => (
+                                            <li key={`${crewMember.id}-${crewMember.name}-${crewMember.job}`}>{crewMember.name} - {crewMember.job}</li>
+                                        ))}
+                                    </ul>
+                                    <div className="recommendations">
+                                        <h3>Recommandations :</h3>
+                                        <div className="recommendation-grid">
+                                            {recommendations.map((recMovie) => (
+                                                <div
+                                                    key={recMovie.id}
+                                                    className="recommendation-item"
+                                                    onClick={() => handleMovieClick(recMovie)} // Remplace le contenu du modal
+                                                >
+                                                    <img
+                                                        src={`https://image.tmdb.org/t/p/w200${recMovie.poster_path}`}
+                                                        alt={recMovie.title} />
+                                                    <p>{recMovie.title}</p>
+                                                </div>
+                                            ))}
+                                        </div></div>
+                                </>
+                            )}
+                        </motion.div>
+                    </motion.div>
                 )}
-            <div className="movie-card" onClick={handlePopupToggle}>
-                <img
-                    ref={imageRef}  // Associer la ref à l'image
-                    src={movie.poster_path ?
-                        "https://image.tmdb.org/t/p/original" + movie.poster_path :
-                        "./img/poster.jpg"
-                    }
-                    alt={` affiche ${movie.title}`}
-
-
-                />
-                {isPopupOpen && trailerKey && (
-                    < div className="movie-trailer-overlay">
-
-
-                        <iframe
-                            width="560"
-                            height="315"
-                            src={`https://www.youtube.com/embed/${trailerKey}`}
-
-                            title="YouTube video player"
-
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            onError={() => setTrailerKey(null)}
-                        // En cas d'erreur de chargement, réinitialiser la clé
-                        ></iframe>
-
-
-                    </div>
-
-                )} <div> {isPopupOpen && !trailerKey && <p>Hélas, il n'y a pas de bande-annonce disponible pour ce film.</p>}
-
-
-                </div></div>
-
-
-
-
-
-            <h4 className='release'>{movie.release_date ?
-                <span>Sorti le: {dateFormat(movie.release_date)} </span> : null
-            }</h4>
-            <h4>{movie.vote_average.toFixed(1) + "/10"}<span>⭐</span></h4>
-
-            <ul className='genres'>
-                {movie.genre_ids ? filmGenres() : movie.genres.map((genre) => <li key={genre}>
-                    {genre.name}
-                </li>)}
-            </ul>
-
-            {movie.overview ?
-                <h2 className='overview'></h2> : ""}
-            <p>{movie.overview}</p>
-
-        </div>
+            </AnimatePresence></>
     );
-});
+};
 
 export default Card;
 

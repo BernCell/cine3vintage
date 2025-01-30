@@ -1,0 +1,6 @@
+# pack-refs with: peeled fully-peeled sorted 
+48dd9f96d0ef0e0e0263c448c2ba37f38f25daba refs/heads/gh-pages
+1be90937e14d837e79d95488fd5b2d9d0743792a refs/heads/master
+c43bcb53faa374b93afbec6576bb77c5be5a0cd0 refs/heads/testing
+c43bcb53faa374b93afbec6576bb77c5be5a0cd0 refs/pull/1/head
+ea53649a0c777e6b4a032ed49cbb3f7a61fdead4 refs/pull/1/merge
