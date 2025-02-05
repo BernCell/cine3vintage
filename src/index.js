@@ -13,4 +13,4 @@ root.render(
 );
 
 // Enregistrez le Service Worker
-serviceWorkerRegistration.unregister();
+serviceWorkerRegistration.register();

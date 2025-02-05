@@ -3,34 +3,28 @@ import axios from 'axios';  // Importation correcte d'axios
 import { config } from 'dotenv';
 import cors from 'cors';
 
+
 config();  // Charger les variables d'environnement depuis le fichier .env
 
 const app = express();
 // const cors = require('cors');
 const port = process.env.PORT || 5001;
 
-const apiKey = process.env.TMDB_API_KEY;  // Votre clé API TMDB
+const apiKey = process.env.TMDB_API_KEY;  // Votre clé API TMDB  
 
 // Permettre les requêtes cross-origin
 app.use(cors());
 
 // Fonction pour obtenir des données de l'API TMDB avec la clé API
-// const getMoviesFromTMDB = async (endpoint) => {
-//     const url = `https://api.themoviedb.org/3${endpoint}&api_key=${apiKey}`;  // Format de l'URL pour TMDB
-//     const response = await axios.get(url);  // Utilisation d'axios pour effectuer la requête GET
-//     return response.data;  // Retour des données de la réponse
-// };
 const getMoviesFromTMDB = async (endpoint) => {
-    const url = `https://api.themoviedb.org/3${endpoint}&api_key=${apiKey}`;
-    console.log(`Requesting TMDB URL: ${url}`); // Log l'URL pour vérifier
-    try {
-        const response = await axios.get(url); // Effectue la requête GET
-        return response.data; // Retourne les données de la réponse
-    } catch (error) {
-        console.error('Error fetching data from TMDB:', error.message);
-        throw error; // Relance l’erreur pour être gérée ailleurs
-    }
+    const url = `https://api.themoviedb.org/3${endpoint}&api_key=${apiKey}`;  // Format de l'URL pour TMDB
+    const response = await axios.get(url);  // Utilisation d'axios pour effectuer la requête GET
+    return response.data;  // Retour des données de la réponse
 };
+
+
+
+
 
 // 1. Endpoint du 2eme appel de Form.js pour récupérer la liste des genres de films
 app.get('/api/genre/movie/list', async (req, res) => {
@@ -45,7 +39,8 @@ app.get('/api/genre/movie/list', async (req, res) => {
 
 // 2. Endpoint du 1er appel dans Form.js pour rechercher des films en fonction du terme "query"
 app.get('/api/search/movie', async (req, res) => {
-    const { query, language } = req.query;  // Récupérer la requête de recherche et la langue
+    const { query, language } = req.query;
+    // Récupérer la requête de recherche et la langue
     try {
         const data = await getMoviesFromTMDB(`/search/movie?query=${query}&language=${language}`);
         res.json(data);  // Retourner la réponse sous forme JSON
@@ -67,6 +62,49 @@ app.get('/api/movies/:id/videos', async (req, res) => {
     }
 });
 
+// 3bis. Endpoint de Card pour récupérer les crédits et les recommandations via un modal
+
+app.get('/api/movies/:id/credits', async (req, res) => {
+    const movieId = req.params.id;
+    const apiKey = process.env.TMDB_API_KEY; // Assurez-vous que votre clé API TMDb est correctement configurée
+
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
+            params: {
+                api_key: apiKey,
+                language: 'fr-FR' // Vous pouvez ajuster la langue selon vos besoins
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Erreur lors de la récupération des crédits pour le film ID: ${movieId}`, error);
+        res.status(500).json({ error: "Erreur lors de la récupération des crédits du film" });
+    }
+});
+
+
+app.get('/api/movies/:id/recommendations', async (req, res) => {
+    const movieId = req.params.id;
+    const apiKey = process.env.TMDB_API_KEY;
+
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/recommendations`, {
+            params: {
+                api_key: apiKey,
+                language: 'fr-FR'
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Erreur lors de la récupération des recommandations pour le film ID: ${movieId}`, error);
+        res.status(500).json({ error: "Erreur lors de la récupération des recommandations du film" });
+    }
+});
+
+
+
+
+
 // 4. Endpoint du 1er appel dans VintageForm.js pour rechercher des films avec un terme "debouncedSearchQuery"
 app.get('/api/search/movie', async (req, res) => {
     const { query, language } = req.query;  // Récupérer la requête de recherche et la langue
@@ -81,39 +119,38 @@ app.get('/api/search/movie', async (req, res) => {
 
 
 
+
 // 5. Endpoint du 2ème appel de VintageForm.js pour découvrir des films par plage de dates et langue
-// app.get('/api/discover/movie', async (req, res) => {
-//     console.log('Request received with params:', req.query);  // Log des paramètres de la requête
-//     const { startDate, endDate, language } = req.query;  // Récupérer les dates et la langue depuis la requête
-//     try {
-//         // Vérifiez si les paramètres sont corrects avant de faire la requête
-//         if (!startDate || !endDate || !language) {
-//             return res.status(400).send('Missing required query parameters');
-//         }
-//         // &with_original_language=${language}&language=${language}
-//         const data = await getMoviesFromTMDB(`/discover/movie?primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}&with_original_language=${language}&language=${language}`);
-//         res.json(data);  // Retourner la réponse sous forme JSON
-//     } catch (error) {
-//         res.status(500).send('Erreur lors de la récupération des films populaires');
-//     }
-// });
-
-
 
 app.get('/api/discover/movie', async (req, res) => {
-    console.log('Backend params received:', { startDate, endDate, language });
-    console.log('Request received with params:', req.query);  // Log des paramètres de la requête
-    const { 'primary_release_date.gte': startDate, 'primary_release_date.lte': endDate, language } = req.query;  // Adaptez pour correspondre aux noms envoyés par le frontend
     try {
-        if (!startDate || !endDate || !language) {
-            return res.status(400).send('Missing required query parameters');
-        }
-        const data = await getMoviesFromTMDB(`/discover/movie?primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}&with_original_language=${language}&language=${language}`);
-        res.json(data);  // Retourner la réponse sous forme JSON
+        const apiKey = process.env.TMDB_API_KEY; // Récupérer la clé API
+
+        // 🛑 Récupération des paramètres depuis la requête
+        const { from, to, lang } = req.query;
+
+
+        console.log("Params reçus :", req.query); // Debugging
+
+        const response = await axios.get("https://api.themoviedb.org/3/discover/movie", {
+            params: {
+                'primary_release_date.gte': from || '1940-01-01', // Valeur par défaut
+                'primary_release_date.lte': to || '1949-12-31',   // Valeur par défaut
+                with_original_language: lang || 'fr', // Valeur par défaut
+                language: 'fr-FR',
+                api_key: apiKey
+            }
+        });
+
+        res.json(response.data);
     } catch (error) {
-        res.status(500).send('Erreur lors de la récupération des films populaires');
+        console.error("Erreur API TMDB :", error.response?.data || error.message);
+        res.status(500).json({ error: "Erreur lors de la récupération des films" });
     }
 });
+
+
+
 
 
 // 6. Endpoint pour récupérer un film populaire spécifique par son ID
@@ -130,5 +167,5 @@ app.get('/api/movies/popular/:id', async (req, res) => {
 
 // Démarrer le serveur
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Serveur démarré sur http://localhost:${port}`);
 });

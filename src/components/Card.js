@@ -13,29 +13,52 @@ const Card = ({ movie }) => {
     const [loadingDetails, setLoadingDetails] = useState(false); // Spinner pour le chargement des détails
 
 
+
+
+
+
     const handleMovieClick = (recMovie) => {
         setLoadingDetails(true); // Afficher le spinner
-        axios
-            .get(`http://localhost:5001/api/movies/${recMovie.id}/credits?language=fr-FR`)
+
+        // Récupérer les détails et recommandations du film cliqué
+        axios.get(`http://localhost:5001/api/movies/${recMovie.id}/credits?language=fr-FR`)
             .then((res) => {
-                console.log("credits", res.data);
-
-                setDetails(res.data); // Charger les détails
-                setModalMovie(recMovie); // Mettre à jour toutes les infos principales avec le film recommandé
-
+                setDetails(res.data);
+                setModalMovie(recMovie);
+                console.log(modalMovie)
                 return axios.get(`http://localhost:5001/api/movies/${recMovie.id}/recommendations?language=fr-FR`);
             })
             .then((res) => {
-                // Filtrage local des recommandations pour la période 1940-1980
                 const filteredRecommendations = res.data.results.filter((movie) => {
                     const releaseDate = movie.release_date;
                     return releaseDate >= '1940-01-01' && releaseDate <= '1980-12-31';
                 });
-                setRecommendations(filteredRecommendations || []); // Charger les recommandations filtrées
+                setRecommendations(filteredRecommendations);
             })
-            .catch((error) => console.error("Erreur lors du chargement des détails :", error))
-            .finally(() => setLoadingDetails(false)); // Masquer le spinner
+            .catch((error) => {
+                console.error("Erreur lors du chargement des détails :", error);
+                if (error.response) {
+                    // La requête a été faite et le serveur a répondu avec un code de statut qui
+                    // ne tombe pas dans la plage des 2xx
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    // La requête a été faite mais aucune réponse n'a été reçue
+                    console.log(error.request);
+                } else {
+                    // Quelque chose s'est passé lors de la configuration de la requête qui a déclenché une erreur
+                    console.log('Error', error.message);
+                }
+            })
+            .finally(() => setLoadingDetails(false));
+
     };
+
+
+
+
+
 
 
     const closeModal = () => {
@@ -369,6 +392,7 @@ const Card = ({ movie }) => {
                         </motion.div>
                     </motion.div>
                 )}
+
             </AnimatePresence></>
     );
 };
