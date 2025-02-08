@@ -44,6 +44,7 @@
      
       margin: auto;
       cursor: pointer;
+    
     }
   
     #btn {
@@ -66,6 +67,12 @@
         box-shadow: 0 0 10px $color-3;
         font-size: 1.025rem;
       }
+
+      // &::after {
+      //   cursor: none;
+      //   background: $color-2;
+      //   color: $color-1;
+      // }
     }
   
     flex: 1 0 25%;

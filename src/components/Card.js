@@ -13,10 +13,6 @@ const Card = ({ movie }) => {
     const [loadingDetails, setLoadingDetails] = useState(false); // Spinner pour le chargement des détails
 
 
-
-
-
-
     const handleMovieClick = (recMovie) => {
         setLoadingDetails(true); // Afficher le spinner
 
@@ -54,11 +50,6 @@ const Card = ({ movie }) => {
             .finally(() => setLoadingDetails(false));
 
     };
-
-
-
-
-
 
 
     const closeModal = () => {
