@@ -1,0 +1,91 @@
+.vintageForm-component {
+    .vintageForm-container {
+      text-align: center;
+    
+    }
+    form {
+      width: 300px;
+      margin: 0 auto;
+  
+  
+      .dropbtn {
+       
+        padding: 1px 10px;
+        width: 250px;
+        border-radius: 0 0 10px 10px;
+        border: none;
+        background: $color-1;
+        color: $white;
+        font-size: 1.3rem;
+        cursor: pointer;
+        z-index: 10;
+        position: relative;
+  
+        &:hover {
+          background: $black;
+  
+      }
+  
+    
+      }
+      
+      
+      
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      
+     
+  
+      input[type="text"] {
+        padding: 1px 10px;
+        border-radius: 10px 10px 0 0;
+        border: none;
+        font-size: 1.3rem;
+        display: block;
+        margin: 0 auto;
+        width: 250px;
+        outline: none;
+        text-align: center;
+      }
+     
+      
+    }
+    .btn-sort-container {
+      margin: 8px auto;
+      width: 220px;
+      display: flex;
+      justify-content: space-around;
+      cursor: pointer;
+  
+      #top, #old {
+        border-radius: 10px 0 0 10px;
+      }
+      #flop, #oldest {
+        border-radius: 0 10px 10px 0;
+      }
+      #top,
+      #flop, #old, #oldest {
+        background: $color-1;
+        width: 110px;
+        transition: 0.3s;
+        position: relative;
+  
+        &:hover {
+          background: $black;
+        }
+      }
+  
+      #top h2, #flop h2, #old h2, #oldest h2 {
+        font-size: 1,5rem;
+      }
+      
+      #top span,
+      #flop span, #old span, #oldest span {
+        
+        top: 50%;
+      }
+    }
+  }
+  
