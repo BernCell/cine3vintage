@@ -17,7 +17,8 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.2",
     "react-scripts": "^5.0.1",
-    "sass": "^1.83.4"
+    "sass": "^1.83.4",
+    "webpack-dev-server": "^5.2.2"
   },
   "scripts": {
     "start": "react-scripts start",
